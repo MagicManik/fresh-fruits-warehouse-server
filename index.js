@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
@@ -25,7 +25,15 @@ async function run() {
 
 
 
-        // _______ TO LOAD DATA FROM DATABASE _____
+        // _______ TO LOAD SINGLE DATA FROM DATABASE ______
+        app.get('/inventory/:id', async (req, res) => {
+            const query = { _id: ObjectId(req.params.id) };
+            const result = await inventoryCollection.findOne(query);
+            res.send(result);
+        })
+
+
+        // _______ TO LOAD MULTIPLE DATA FROM DATABASE _____
         app.get('/inventory', async (req, res) => {
             const query = {};
             const cursor = inventoryCollection.find(query);
