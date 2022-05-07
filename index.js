@@ -24,10 +24,21 @@ async function run() {
         const inventoryCollection = client.db('freshFruitsWarehouse').collection('inventory');
 
 
+        // ______ TO INSERT DATA IN DATABASE ______
+        app.post('/inventory', async (req, res) => {
+            const item = req.body;
+            const result = await inventoryCollection.insertOne(item);
+            res.send(result);
+        })
+
+
+
+
 
         // _______ TO LOAD SINGLE DATA FROM DATABASE ______
         app.get('/inventory/:id', async (req, res) => {
-            const query = { _id: ObjectId(req.params.id) };
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
             const result = await inventoryCollection.findOne(query);
             res.send(result);
         })
@@ -41,6 +52,32 @@ async function run() {
             res.send(result);
         });
 
+
+        // // ______ TO UPDATE SINGLE DATA OF DATABASE _____
+        // app.get('/inventory/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const updateStock = req.body;
+
+        //     console.log(req.body);
+
+        //     const filter = { _id: ObjectId(id) };
+
+        //     const options = { upsert: true };
+
+        //     const updateDoc = {
+        //         $set: {
+        //             quantity: updateStock.quantity
+        //         }
+        //     };
+
+        //     const result = await inventoryCollection.updateOne(filter, updateDoc, options);
+
+        //     res.send(result);
+
+
+
+
+        // })
 
 
     }
