@@ -13,9 +13,6 @@ app.use(express.json());
 
 
 
-
-
-
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -35,8 +32,7 @@ function verifyJWT(req, res, next) {
 
 
 
-
-// _______ CONNECTION SERVER TO DATABASE _______
+// _______ TO CONNECT SERVER TO DATABASE _______
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.wceiw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -48,24 +44,12 @@ async function run() {
         const inventoryCollection = client.db('freshFruitsWarehouse').collection('inventory');
 
 
-
         // ______ TO INSERT DATA IN DATABASE ______
         app.post('/inventory', async (req, res) => {
             const item = req.body;
             const result = await inventoryCollection.insertOne(item);
             res.send(result);
         })
-
-
-
-
-        // _______ TO LOAD SINGLE DATA FROM DATABASE ______
-        app.get('/inventory/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: ObjectId(id) };
-            const result = await inventoryCollection.findOne(query);
-            res.send(result);
-        });
 
 
         // _______ TO LOAD MULTIPLE DATA FROM DATABASE _____
@@ -75,11 +59,6 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         });
-
-
-
-
-
 
 
 
@@ -102,8 +81,6 @@ async function run() {
 
 
 
-
-
         // USUE TOKEN WHEN USER LOGIN
         app.post('/login', async (req, res) => {
             const user = req.body;
@@ -115,42 +92,44 @@ async function run() {
 
 
 
-        // ______ LOAD DATA FOR SPECIFIC USER USING SEARCH QUERY ____
-        // app.get('/inventory', async (req, res) => {
-        //     const email = req.query.email;
-        //     const query = { email: email };
-        //     const cursor = inventoryCollection.find(query);
-        //     const result = await cursor.toArray();
-        //     res.send(result);
-        // });
+        // _______ TO LOAD SINGLE DATA FROM DATABASE ______
+        app.get('/inventory/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await inventoryCollection.findOne(query);
+            res.send(result);
+        });
 
 
 
-        // // ______ TO UPDATE SINGLE DATA OF DATABASE _____
-        // app.get('/inventory/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const updateStock = req.body;
+        // update data : update a fruit item's quantity
+        app.put('/inventory/:id', async (req, res) => {
 
-        //     console.log(req.body);
+            const id = req.params.id;
+            const updateQuantity = req.body;
+            console.log(updateQuantity)
 
-        //     const filter = { _id: ObjectId(id) };
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    quantity: updateQuantity.newQuantity,
+                }
+            };
 
-        //     const options = { upsert: true };
-
-        //     const updateDoc = {
-        //         $set: {
-        //             quantity: updateStock.quantity
-        //         }
-        //     };
-
-        //     const result = await inventoryCollection.updateOne(filter, updateDoc, options);
-
-        //     res.send(result);
+            const result = await inventoryCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
 
 
 
-
-        // })
+        // delete data : delete a specific fruit item
+        app.delete('/inventory/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await inventoryCollection.deleteOne(query);
+            res.send(result);
+        });
 
 
     }
