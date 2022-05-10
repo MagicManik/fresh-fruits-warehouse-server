@@ -90,7 +90,6 @@ async function run() {
 
 
 
-
         // _______ TO LOAD SINGLE DATA FROM DATABASE ______
         app.get('/inventory/:id', async (req, res) => {
             const id = req.params.id;
@@ -98,7 +97,6 @@ async function run() {
             const result = await inventoryCollection.findOne(query);
             res.send(result);
         });
-
 
 
         // update data : update a fruit item's quantity
@@ -119,7 +117,6 @@ async function run() {
             const result = await inventoryCollection.updateOne(filter, updatedDoc, options);
             res.send(result);
         });
-
 
 
         // delete data : delete a specific fruit item
